@@ -13,6 +13,7 @@ export interface ICustomer extends Document {
   customerImage: string;
   createdAt: Date;
   updatedAt: Date;
+  toObject(): any;
 }
 
 export interface ISeller extends Document {
@@ -25,9 +26,12 @@ export interface ISeller extends Document {
   sellerImage: string;
   createdAt: Date;
   updatedAt: Date;
+  toObject(): any;
 }
 
 export interface AuthRequest extends Request {
   seller?: ISeller;
   customer?: ICustomer;
+  file?: any;
+  files?: any;
 }
