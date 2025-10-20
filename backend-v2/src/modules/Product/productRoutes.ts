@@ -1,16 +1,20 @@
 import express from 'express';
 import auth from '../../middleware/auth.js';
+import multer from 'multer';
+import * as productController from './productController.js';
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
-router.post('/create', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.get('/get-all', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.get('/shop/get-all', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.get('/shop/get-product/:id', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.post('/get-all-by-id', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.get('/search', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.get('/get-product/:id', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.patch('/update-product', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
-router.delete('/delete/:id', auth, (req, res) => res.status(501).json({ message: 'Not implemented yet' }));
+router.post('/create', auth, upload.array('productImages', 4), productController.createProduct);
+router.get('/get-all', auth, productController.getAllProducts);
+router.get('/shop/get-all', auth, productController.getAllProductsForShop);
+router.get('/shop/get-product/:id', auth, productController.getProductDetails);
+router.post('/get-all-by-id', auth, productController.getAllProductsById);
+router.get('/search', auth, productController.searchProducts);
+router.get('/get-product/:id', auth, productController.getSingleProduct);
+router.patch('/update-product', auth, upload.array('productImages', 4), productController.updateProduct);
+router.delete('/delete/:id', auth, productController.deleteProduct);
 
 export default router;
