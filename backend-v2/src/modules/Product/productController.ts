@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import * as productService from './productService';
 import { validationResult } from 'express-validator';
+import { baseProductValidators } from './productValidation';
 
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = [
+  ...baseProductValidators,
+  async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -34,7 +37,7 @@ export const createProduct = async (req: Request, res: Response) => {
     }
     res.status(500).json({ error: 'Server error' });
   }
-};
+}];
 
 export const getAllProducts = async (req: Request, res: Response) => {
   const seller = (req as any).seller;
