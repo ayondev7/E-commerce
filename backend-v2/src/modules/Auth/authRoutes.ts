@@ -1,8 +1,9 @@
 import express from 'express';
-import * as authCheck from './authController.js';
+import * as authController from './authController.js';
+import * as authCheckController from './authCheckController.js';
 
 const router = express.Router();
 
-router.get('/auth-check', authCheck.getUserType);
+router.get('/auth-check', authCheckController.getUserType);
 
 export default router;

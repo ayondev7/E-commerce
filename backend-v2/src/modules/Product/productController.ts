@@ -5,44 +5,52 @@ import { baseProductValidators } from './productValidation';
 
 export const createProduct = [
   ...baseProductValidators,
-  async (req: Request, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
 
-    const seller = (req as any).seller;
-    if (!seller || !seller._id) {
-      return res.status(403).json({ error: 'Unauthorized!' });
-    }
+      const seller = (req as any).seller;
+      if (!seller || !seller._id) {
+        res.status(403).json({ error: 'Unauthorized!' });
+        return;
+      }
 
-    if (!req.files || (req.files as any[]).length === 0) {
-      return res.status(400).json({ error: 'At least one product image is required' });
-    }
+      if (!req.files || (req.files as any[]).length === 0) {
+        res.status(400).json({ error: 'At least one product image is required' });
+        return;
+      }
 
-    if ((req.files as any[]).length > 4) {
-      return res.status(400).json({ error: 'Maximum 4 images allowed' });
-    }
+      if ((req.files as any[]).length > 4) {
+        res.status(400).json({ error: 'Maximum 4 images allowed' });
+        return;
+      }
 
-    const product = await productService.createProduct(req.body, req.files as any[], seller._id);
+      const product = await productService.createProduct(req.body, req.files as any[], seller._id);
 
-    res.status(201).json({ message: 'Product created successfully', productId: product._id });
-  } catch (err: any) {
-    if (err.code === 11000) {
-      return res.status(400).json({ error: 'SKU already exists' });
+      res.status(201).json({ message: 'Product created successfully', productId: product._id });
+    } catch (err: any) {
+      if (err.code === 11000) {
+        res.status(400).json({ error: 'SKU already exists' });
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.status(500).json({ error: 'Server error' });
     }
-    if (err.name === 'ValidationError') {
-      return res.status(400).json({ error: err.message });
-    }
-    res.status(500).json({ error: 'Server error' });
-  }
-}];
+  },
+];
 
-export const getAllProducts = async (req: Request, res: Response) => {
+export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
   const seller = (req as any).seller;
   if (!seller || !seller._id) {
-    return res.status(403).json({ error: 'Unauthorized!' });
+    res.status(403).json({ error: 'Unauthorized!' });
+    return;
   }
   const sellerId = seller._id;
   try {
@@ -53,12 +61,13 @@ export const getAllProducts = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllProductsById = async (req: Request, res: Response) => {
+export const getAllProductsById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { products } = req.body;
 
     if (!products || !Array.isArray(products) || products.length === 0) {
-      return res.status(400).json({ error: 'No products provided' });
+      res.status(400).json({ error: 'No products provided' });
+      return;
     }
 
     const productIds = products.map((p: any) => p.productId || p.id);
@@ -125,16 +134,18 @@ export const getProductDetails = async (req: Request, res: Response) => {
   }
 };
 
-export const searchProducts = async (req: Request, res: Response) => {
+export const searchProducts = async (req: Request, res: Response): Promise<void> => {
   if (!(req as any).seller && !(req as any).customer) {
-    return res.status(403).json({ error: 'Unauthorized!' });
+    res.status(403).json({ error: 'Unauthorized!' });
+    return;
   }
 
   try {
     const { category, keyword } = req.query;
 
     if (!keyword || String(keyword).trim() === '') {
-      return res.status(200).json({ products: [] });
+      res.status(200).json({ products: [] });
+      return;
     }
 
     const products = await productService.searchProducts(String(keyword), category as string);
@@ -165,20 +176,22 @@ export const getSingleProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const seller = (req as any).seller;
     const { _id: sellerId } = seller;
     const { id: productId } = req.params;
 
     if (!sellerId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
     const product = await productService.deleteProduct(productId, sellerId);
 
     if (!product) {
-      return res.status(404).json({ error: 'Product not found or not authorized' });
+      res.status(404).json({ error: 'Product not found or not authorized' });
+      return;
     }
 
     res.status(200).json({ message: 'Product deleted successfully' });
@@ -187,12 +200,13 @@ export const deleteProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { productId, retainedImageUrls } = req.body;
 
     if (!productId) {
-      return res.status(400).json({ success: false, message: 'Product ID is required' });
+      res.status(400).json({ success: false, message: 'Product ID is required' });
+      return;
     }
 
     const updateData = productService.formatProductForUpdate(req.body);
@@ -207,7 +221,8 @@ export const updateProduct = async (req: Request, res: Response) => {
     const updatedProduct = await productService.updateProduct(productId, updateData, req.files as any[], parsedRetainedUrls);
 
     if (!updatedProduct) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      res.status(404).json({ success: false, message: 'Product not found' });
+      return;
     }
 
     res.status(200).json({
