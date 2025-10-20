@@ -3,15 +3,15 @@ import express from 'express';
 const router = express.Router();
 
 const routes = [
-  { path: '/sellers', module: './sellerRoutes.js' },
-  { path: '/products', module: './productRoutes.js' },
-  { path: '/customers', module: './customerRoutes.js' },
-  { path: '/carts', module: './cartRoutes.js' },
-  { path: '/wishlists', module: './wishlistRoutes.js' },
-  { path: '/addresses', module: './addressRoutes.js' },
-  { path: '/orders', module: './orderRoutes.js' },
-  { path: '/auth', module: './authCheckRoute.js' },
-  { path: '/payment', module: './paymentRoutes.js' },
+  { path: '/sellers', module: '../modules/Seller/sellerRoutes.js' },
+  { path: '/products', module: '../modules/Product/productRoutes.js' },
+  { path: '/customers', module: '../modules/Customer/customerRoutes.js' },
+  { path: '/carts', module: '../modules/Cart/cartRoutes.js' },
+  { path: '/wishlists', module: '../modules/Wishlist/wishlistRoutes.js' },
+  { path: '/addresses', module: '../modules/Address/addressRoutes.js' },
+  { path: '/orders', module: '../modules/Order/orderRoutes.js' },
+  { path: '/auth', module: '../modules/Auth/authRoutes.js' },
+  { path: '/payment', module: '../modules/Payment/paymentRoutes.js' },
 ];
 
 (async () => {
