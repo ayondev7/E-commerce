@@ -1,6 +1,6 @@
 import express from 'express';
-import * as sellerController from '../modules/Seller/sellerController.js';
-import auth from '../middleware/auth.js';
+import auth from '../../middleware/auth.js';
+import * as sellerController from './sellerController.js';
 import multer from 'multer';
 import path from 'path';
 
@@ -10,7 +10,7 @@ const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     const filetypes = /jpeg|jpg|png|webp/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
