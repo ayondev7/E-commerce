@@ -187,7 +187,7 @@ export async function removeOrderedProductsFromCart(customerId: Types.ObjectId |
   for (const cart of carts) {
     const productIdsArray = Array.isArray(cart.productIds)
       ? cart.productIds.map((id: any) => id.toString())
-      : [cart.productIds.toString()];
+      : [(cart.productIds as any).toString()];
 
     const remaining = productIdsArray.filter(
       (id: string) => !orderedProductIds.includes(id)

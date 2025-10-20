@@ -76,7 +76,7 @@ const orderSchema = new Schema<IOrder>(
 orderSchema.pre('save', async function (next) {
   if (this.isNew) {
     if (!this.orderId) {
-      let newOrderId;
+      let newOrderId: string | undefined;
       let orderExists = true;
 
       while (orderExists) {
@@ -84,11 +84,11 @@ orderSchema.pre('save', async function (next) {
         orderExists = await (this.constructor as any).exists({ orderId: newOrderId });
       }
 
-      this.orderId = newOrderId;
+      this.orderId = newOrderId!;
     }
 
     if (!this.transactionId) {
-      let newTxnId;
+      let newTxnId: string | undefined;
       let txnExists = true;
 
       while (txnExists) {
@@ -96,7 +96,7 @@ orderSchema.pre('save', async function (next) {
         txnExists = await (this.constructor as any).exists({ transactionId: newTxnId });
       }
 
-      this.transactionId = newTxnId;
+      this.transactionId = newTxnId!;
     }
   }
 

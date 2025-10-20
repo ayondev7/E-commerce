@@ -10,7 +10,7 @@ export async function comparePassword(plainPassword: string, hashedPassword: str
 }
 
 export function generateToken(payload: object, expiresIn: string = '3h'): string {
-  return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn });
+  return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: expiresIn as any });
 }
 
 export function verifyToken(token: string): any {

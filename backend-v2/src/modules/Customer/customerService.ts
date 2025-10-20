@@ -99,7 +99,7 @@ export async function getCustomerNotifications(customerId: Types.ObjectId | stri
 
   return activities.map((activity) => ({
     ...activity.toObject(),
-    isNew: !lastSeenId || activity._id.toString() > lastSeenId.toString(),
+    isNew: !lastSeenId || (activity._id as any).toString() > lastSeenId.toString(),
   }));
 }
 

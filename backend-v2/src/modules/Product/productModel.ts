@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IProduct extends Document {
+export interface IProduct {
+  _id?: mongoose.Types.ObjectId;
   title: string;
   description: string;
   productImages: string[];
@@ -22,6 +23,8 @@ export interface IProduct extends Document {
   seoTitle?: string;
   seoDescription?: string;
   sellerId: mongoose.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const productSchema = new Schema<IProduct>({
