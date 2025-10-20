@@ -32,13 +32,15 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
     if (!customerId) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ success: false, message: 'Customer ID is required' });
+      res.status(400).json({ success: false, message: 'Customer ID is required' });
+      return;
     }
 
     if (!checkoutPayload || !checkoutPayload.products || checkoutPayload.products.length === 0) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ success: false, message: 'Products are required in checkout payload' });
+      res.status(400).json({ success: false, message: 'Products are required in checkout payload' });
+      return;
     }
 
     let shippingInfoId;
@@ -50,7 +52,8 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       if (!addressLine1 || !city || !zipCode || !country) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(400).json({ success: false, message: 'Address details are required when addressId is not provided' });
+        res.status(400).json({ success: false, message: 'Address details are required when addressId is not provided' });
+        return;
       }
 
       const primaryAddress = new Address({
@@ -95,7 +98,8 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       if (!foundAddress) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(404).json({ success: false, message: 'Address not found' });
+        res.status(404).json({ success: false, message: 'Address not found' });
+        return;
       }
       addressForGateway = {
         addressLine: foundAddress.addressLine,
@@ -119,7 +123,8 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       if (!productId || !quantity || price === undefined) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(400).json({ success: false, message: 'Each product must have productId, quantity, and price' });
+        res.status(400).json({ success: false, message: 'Each product must have productId, quantity, and price' });
+        return;
       }
 
       const quantityNum = parseInt(quantity);
@@ -144,7 +149,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       const carts = await Cart.find({ customerId }).session(session);
 
       for (const cart of carts) {
-        const productIdsArray = Array.isArray(cart.productIds) ? cart.productIds.map((id: any) => id.toString()) : [cart.productIds.toString()];
+        const productIdsArray = Array.isArray(cart.productIds) ? cart.productIds.map((id: any) => id.toString()) : [(cart.productIds as any).toString()];
         const remaining = productIdsArray.filter((id: string) => !orderedProductIds.includes(id));
 
         if (remaining.length === 0) {
@@ -158,7 +163,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       await session.commitTransaction();
       session.endSession();
 
-      return res.status(201).json({
+      res.status(201).json({
         success: true,
         message: 'Orders created successfully',
         data: {
@@ -174,6 +179,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
           },
         },
       });
+      return;
     } else if (paymentMethod === 'gateway') {
       const tempOrderData = {
         customerId,
@@ -196,14 +202,15 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       const apiResponse = await orderService.initializePaymentGateway(paymentData);
 
       if (apiResponse.GatewayPageURL) {
-        return res.status(200).json({
+        res.status(200).json({
           success: true,
           message: 'Payment session created',
           data: { paymentUrl: apiResponse.GatewayPageURL, sessionkey: apiResponse.sessionkey },
         });
       } else {
-        return res.status(400).json({ success: false, message: 'Failed to create payment session', error: apiResponse });
+        res.status(400).json({ success: false, message: 'Failed to create payment session', error: apiResponse });
       }
+      return;
     }
   } catch (error: any) {
     try {
@@ -212,7 +219,7 @@ export const AddOrder = async (req: Request, res: Response): Promise<void> => {
       }
     } catch (abortErr) {}
     session.endSession();
-    return res.status(500).json({ success: false, message: 'Failed to create order', error: error.message });
+    res.status(500).json({ success: false, message: 'Failed to create order', error: error.message });
   }
 };
 
@@ -268,7 +275,7 @@ export const paymentSuccess = async (req: Request, res: Response): Promise<void>
       return res.redirect(`${process.env.FRONTEND_URL}/payment/fail?tran_id=${tran_id}`);
     }
   } catch (error) {
-    return res.redirect(`${process.env.FRONTEND_URL}/payment/fail?tran_id=${tran_id}`);
+    res.redirect(`${process.env.FRONTEND_URL}/payment/fail?tran_id=${tran_id}`);
   }
 };
 
@@ -285,9 +292,9 @@ export const paymentFail = async (req: Request, res: Response): Promise<void> =>
       }
     }
 
-    return res.redirect(`${process.env.FRONTEND_URL}/payment/fail?tran_id=${tran_id || 'unknown'}`);
+    res.redirect(`${process.env.FRONTEND_URL}/payment/fail?tran_id=${tran_id || 'unknown'}`);
   } catch (error: any) {
-    return res.status(500).json({ success: false, message: 'Failed to process payment failure', error: error.message });
+    res.status(500).json({ success: false, message: 'Failed to process payment failure', error: error.message });
   }
 };
 
@@ -300,7 +307,8 @@ export const getAllOrders = async (req: Request, res: Response): Promise<void> =
     const customer = (req as any).customer;
 
     if (!customer || !customer._id) {
-      return res.status(400).json({ success: false, message: 'Customer information not found' });
+      res.status(400).json({ success: false, message: 'Customer information not found' });
+      return;
     }
 
     const orders = await orderService.getOrdersByCustomer(customer._id);
@@ -316,7 +324,8 @@ export const getSellerOrders = async (req: Request, res: Response): Promise<void
     const seller = (req as any).seller;
 
     if (!seller || !seller._id) {
-      return res.status(400).json({ success: false, message: 'Seller information not found' });
+      res.status(400).json({ success: false, message: 'Seller information not found' });
+      return;
     }
 
     const orders = await orderService.getOrdersBySeller(seller._id);
@@ -335,7 +344,8 @@ export const getOrderById = async (req: Request, res: Response): Promise<void> =
     const order = await orderService.getOrderById(id, sellerId);
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found or unauthorized' });
+      res.status(404).json({ message: 'Order not found or unauthorized' });
+      return;
     }
 
     res.json(order);
@@ -353,21 +363,25 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
     const customerId = (req as any).customer?._id;
 
     if (!orderId || !orderStatus) {
-      return res.status(400).json({ message: 'Order ID and orderStatus are required.' });
+      res.status(400).json({ message: 'Order ID and orderStatus are required.' });
+      return;
     }
 
     const result = await orderService.updateOrderStatus(orderId, orderStatus, customerId, sellerId);
 
     if (!result) {
-      return res.status(404).json({ message: 'Order not found.' });
+      res.status(404).json({ message: 'Order not found.' });
+      return;
     }
 
     if ('authorized' in result && !result.authorized) {
-      return res.status(403).json({ message: 'You are not authorized to update this order.' });
+      res.status(403).json({ message: 'You are not authorized to update this order.' });
+      return;
     }
 
     if ('buyAgain' in result && result.buyAgain) {
-      return res.status(201).json({ message: 'New order created successfully for Buy Again.', newOrder: result.newOrder });
+      res.status(201).json({ message: 'New order created successfully for Buy Again.', newOrder: result.newOrder });
+      return;
     }
 
     res.status(200).json({ message: 'Order status updated successfully.', order: result.order });
@@ -395,7 +409,8 @@ export const getAllPayments = async (req: Request, res: Response): Promise<void>
     const customerId = customer?._id;
 
     if (!customerId) {
-      return res.status(400).json({ message: 'Customer ID is required' });
+      res.status(400).json({ message: 'Customer ID is required' });
+      return;
     }
 
     const payments = await orderService.getPaymentsByCustomer(customerId);

@@ -12,8 +12,8 @@ import mongoose from 'mongoose';
 const orderIdNanoid = customAlphabet('0123456789', 5);
 const txnIdNanoid = customAlphabet('0123456789', 7);
 
-const store_id = process.env.SSLCOMMERZ_STORE_ID;
-const store_passwd = process.env.SSLCOMMERZ_STORE_PASSWORD;
+const store_id = process.env.SSLCOMMERZ_STORE_ID || '';
+const store_passwd = process.env.SSLCOMMERZ_STORE_PASSWORD || '';
 const is_live = process.env.SSLCOMMERZ_IS_LIVE === 'true';
 
 export async function generateUniqueOrderId(session: any) {
@@ -216,8 +216,8 @@ export async function getOrderById(orderId: any, sellerId: any) {
     paymentStatus: order.paymentStatus,
     orderStatus: order.orderStatus,
     paymentMethod: order.paymentMethod,
-    createdAt: order.createdAt,
-    updatedAt: order.updatedAt,
+    createdAt: (order as any).createdAt,
+    updatedAt: (order as any).updatedAt,
     orderId: order.orderId,
     product: {
       _id: product._id,
