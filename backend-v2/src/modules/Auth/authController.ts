@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
-import Seller from '../modules/Seller/sellerModel.js';
-import Customer from '../modules/Customer/customerModel.js';
-import { AuthRequest } from '../types/index.js';
+import Seller from '../Seller/sellerModel.js';
+import Customer from '../Customer/customerModel.js';
+import { AuthRequest } from '../../types/index.js';
 
 export const getUserType = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
