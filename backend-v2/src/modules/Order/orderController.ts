@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import { TempOrder } from './tempOrderModel';
 import Cart from '../Cart/cartModel';
 
-export const AddOrder = async (req: Request, res: Response) => {
+export const AddOrder = async (req: Request, res: Response): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -216,7 +216,7 @@ export const AddOrder = async (req: Request, res: Response) => {
   }
 };
 
-export const paymentSuccess = async (req: Request, res: Response) => {
+export const paymentSuccess = async (req: Request, res: Response): Promise<void> => {
   const { tran_id } = req.query;
   try {
     if (!tran_id || !String(tran_id).startsWith('temp_')) {
@@ -272,7 +272,7 @@ export const paymentSuccess = async (req: Request, res: Response) => {
   }
 };
 
-export const paymentFail = async (req: Request, res: Response) => {
+export const paymentFail = async (req: Request, res: Response): Promise<void> => {
   const { tran_id } = req.query;
 
   try {
@@ -291,11 +291,11 @@ export const paymentFail = async (req: Request, res: Response) => {
   }
 };
 
-export const paymentCancel = async (req: Request, res: Response) => {
-  return paymentFail(req, res);
+export const paymentCancel = async (req: Request, res: Response): Promise<void> => {
+  await paymentFail(req, res);
 };
 
-export const getAllOrders = async (req: Request, res: Response) => {
+export const getAllOrders = async (req: Request, res: Response): Promise<void> => {
   try {
     const customer = (req as any).customer;
 
@@ -311,7 +311,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
   }
 };
 
-export const getSellerOrders = async (req: Request, res: Response) => {
+export const getSellerOrders = async (req: Request, res: Response): Promise<void> => {
   try {
     const seller = (req as any).seller;
 
@@ -327,7 +327,7 @@ export const getSellerOrders = async (req: Request, res: Response) => {
   }
 };
 
-export const getOrderById = async (req: Request, res: Response) => {
+export const getOrderById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const sellerId = (req as any).seller._id;
@@ -344,7 +344,7 @@ export const getOrderById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateOrderStatus = async (req: Request, res: Response) => {
+export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     const { orderId } = req.params;
     const { orderStatus } = req.body;
@@ -376,7 +376,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   }
 };
 
-export const getOrderStatusCounts = async (req: Request, res: Response) => {
+export const getOrderStatusCounts = async (req: Request, res: Response): Promise<void> => {
   try {
     const seller = (req as any).seller;
     const { _id: sellerId } = seller;
@@ -389,7 +389,7 @@ export const getOrderStatusCounts = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllPayments = async (req: Request, res: Response) => {
+export const getAllPayments = async (req: Request, res: Response): Promise<void> => {
   try {
     const customer = (req as any).customer;
     const customerId = customer?._id;

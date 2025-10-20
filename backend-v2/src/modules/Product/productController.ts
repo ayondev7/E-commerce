@@ -79,7 +79,7 @@ export const getAllProductsById = async (req: Request, res: Response): Promise<v
   }
 };
 
-export const getAllProductsForShop = async (req: Request, res: Response) => {
+export const getAllProductsForShop = async (req: Request, res: Response): Promise<void> => {
   try {
     const { page = 1, limit = 20, category, priceRange, priceMin, priceMax, sortBy = 'newest' } = req.query;
 
@@ -119,18 +119,19 @@ export const getAllProductsForShop = async (req: Request, res: Response) => {
   }
 };
 
-export const getProductDetails = async (req: Request, res: Response) => {
+export const getProductDetails = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const product = await productService.getProductDetails(id);
 
     if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+      res.status(404).json({ error: 'Product not found' });
+      return;
     }
 
-    return res.status(200).json(product);
+    res.status(200).json(product);
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
@@ -155,24 +156,26 @@ export const searchProducts = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const getSingleProduct = async (req: Request, res: Response) => {
+export const getSingleProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const sellerId = (req as any).seller?._id;
 
     if (!sellerId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
     const product = await productService.getSingleProduct(id, sellerId);
 
     if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+      res.status(404).json({ error: 'Product not found' });
+      return;
     }
 
-    return res.status(200).json(product);
+    res.status(200).json(product);
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 

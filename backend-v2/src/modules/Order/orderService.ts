@@ -17,19 +17,21 @@ const store_passwd = process.env.SSLCOMMERZ_STORE_PASSWORD;
 const is_live = process.env.SSLCOMMERZ_IS_LIVE === 'true';
 
 export async function generateUniqueOrderId(session: any) {
-  let orderId, orderExists = true;
+  let orderId, orderExists: boolean = true;
   while (orderExists) {
     orderId = `ORD-${orderIdNanoid()}`;
-    orderExists = await Order.exists({ orderId }).session(session);
+    const exists = await Order.exists({ orderId }).session(session);
+    orderExists = exists !== null;
   }
   return orderId;
 }
 
 export async function generateUniqueTransactionId(session: any) {
-  let transactionId, txnExists = true;
+  let transactionId, txnExists: boolean = true;
   while (txnExists) {
     transactionId = `TXN-${txnIdNanoid()}`;
-    txnExists = await Order.exists({ transactionId }).session(session);
+    const exists = await Order.exists({ transactionId }).session(session);
+    txnExists = exists !== null;
   }
   return transactionId;
 }

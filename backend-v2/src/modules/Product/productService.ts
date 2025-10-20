@@ -191,7 +191,7 @@ export async function getProductDetails(productId: any) {
   const product = await Product.findById(productId);
   if (!product) return null;
 
-  const productObj = product.toObject();
+  const productObj: any = product.toObject();
   productObj.productImageStrings = productObj.productImages.map((img: string) => img || null);
 
   if (productObj.specifications && Array.isArray(productObj.specifications)) {
@@ -253,20 +253,20 @@ export async function getSingleProduct(productId: any, sellerId: any) {
   const product = await Product.findOne({ _id: productId, sellerId });
   if (!product) return null;
 
-  const productObj = product.toObject();
+  const productObj: any = product.toObject();
   productObj.productImageStrings = productObj.productImages.map((img: string) => img || null);
-  delete productObj.productImages;
+  const { productImages, ...rest } = productObj;
 
   const quantity = productObj.quantity;
   if (quantity === 0) {
-    productObj.stock = 'out of stock';
+    rest.stock = 'out of stock';
   } else if (quantity <= 10) {
-    productObj.stock = 'low stock';
+    rest.stock = 'low stock';
   } else {
-    productObj.stock = 'active';
+    rest.stock = 'active';
   }
 
-  return productObj;
+  return rest;
 }
 
 export async function deleteProduct(productId: any, sellerId: any) {
