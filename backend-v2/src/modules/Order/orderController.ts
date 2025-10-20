@@ -253,7 +253,7 @@ export const paymentSuccess = async (req: Request, res: Response): Promise<void>
       const carts = await Cart.find({ customerId: tempOrder.customerId }).session(session);
 
       for (const cart of carts) {
-        const productIdsArray = Array.isArray(cart.productIds) ? cart.productIds.map((id: any) => id.toString()) : [cart.productIds.toString()];
+        const productIdsArray = Array.isArray(cart.productIds) ? cart.productIds.map((id: any) => id.toString()) : [(cart.productIds as any).toString()];
         const remaining = productIdsArray.filter((id: string) => !orderedProductIds.includes(id));
 
         if (remaining.length === 0) {
